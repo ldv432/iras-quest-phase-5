@@ -8,7 +8,5 @@ class Reaction(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key=True)
     reaction_type = db.Column(db.String, nullable=False)
 
-    #Serialization
-
     #Relationships
     postreactions = db.relationship('PostReaction', back_populates='reaction', cascade='all, delete-orphan')

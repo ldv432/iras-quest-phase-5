@@ -8,7 +8,8 @@ from flask_restful import Resource
 
 # Local imports
 from config import app, db, api
-# Add your model imports
+from models import monster, npc, player, post, postreaction, reaction, user
+
 
 
 # Views go here!
