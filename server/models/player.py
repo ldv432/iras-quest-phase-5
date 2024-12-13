@@ -10,10 +10,9 @@ class Player(db.Model, SerializerMixin):
     power = db.Column(db.Integer, nullable=False)
     score = db.Column(db.Integer, nullable=False)
     time = db.Column(db.Integer, nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False, index=True)
-
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
     #Relationships
     user = db.relationship('User', back_populates='players')
-    
+
     #Serialization

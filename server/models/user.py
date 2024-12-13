@@ -11,7 +11,7 @@ class User(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String, nullable=False)
     username = db.Column(db.String(30), nullable=False, unique=True)
-    password = db.Column(db.String(25), nullable=False)
+    _password_hash = db.Column(db.String(128), nullable=False)
 
     #Relationships
     players = db.relationship('Player', back_populates='user', cascade='all, delete-orphan')
@@ -19,7 +19,7 @@ class User(db.Model, SerializerMixin):
     postreactions = db.relationship('PostReaction', back_populates='user', cascade='all, delete-orphan')
 
     #Serialization
-    serialize_rules = ('-password', '-players.user', '-posts.user')
+    serialize_rules = ('-_password_hash', '-players', '-posts', '-postreactions')
 
     #Representation
     def __repr__(self):
