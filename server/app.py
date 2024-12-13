@@ -15,7 +15,7 @@ from routes.monster.monsters import Monster
 from routes.npc.npcs import Npc
 from routes.player.players import Player
 from routes.post.posts import ForumPosts, AddForumPost
-from routes.post.posts_by_id import 
+from routes.post.posts_by_id import EditForumPost, DeleteForumPost
 # from routes.post.posts import Post
 # from routes.reaction.reactions import Reaction
 # from routes.postreaction.postreactions import PostReaction

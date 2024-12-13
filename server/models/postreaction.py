@@ -16,4 +16,4 @@ class PostReaction(db.Model, SerializerMixin):
     reaction = db.relationship('Reaction', back_populates='postreactions')
 
     #Serialization
-    serialize_rules = ('-user.postreactions', '-post.postreactions', '-reaction.postreactions')
+    serialize_rules = ('-user', '-post', '-reaction')
