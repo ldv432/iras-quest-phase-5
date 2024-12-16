@@ -12,7 +12,7 @@ function LoginPage() {
     setError(null)
 
     try {
-      const r = await fetch("http://localhost:5000/login", {
+      const r = await fetch("/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -22,7 +22,6 @@ function LoginPage() {
       if (!r.ok) throw new Error(data.error || "Failed to log in")
 
       console.log("Login successful:", data)
-      // Redirect or update state based on successful login
     } catch (err) {
       setError(err.message)
     }

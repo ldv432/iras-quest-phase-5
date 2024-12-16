@@ -1,33 +1,34 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
-import castleImage from "../assets/pictures/Splash.png";
-import { CssVarsProvider } from "@mui/joy/styles";
-import Sheet from "@mui/joy/Sheet";
-import Typography from "@mui/joy/Typography";
-import Button from "@mui/joy/Button";
+import React from "react"
+import { useNavigate } from "react-router-dom"
+import castleImage from "../assets/pictures/Splash.png"
+import { CssVarsProvider } from "@mui/joy/styles"
+import Sheet from "@mui/joy/Sheet"
+import Typography from "@mui/joy/Typography"
+import Button from "@mui/joy/Button"
 
 function WelcomePage() {
-  const nav = useNavigate();
+  const nav = useNavigate()
 
   const handleLogin = () => {
-    nav("/login");
-  };
+    nav("/login")
+  }
 
   const handleSignup = () => {
-    nav("/signup");
-  };
+    nav("/signup")
+  }
 
   return (
     <CssVarsProvider>
       <div
         style={{
           display: "flex",
-          flexDirection: "column",
+          flexDirection: "row",
           alignItems: "center",
           justifyContent: "center",
           minHeight: "100vh",
           gap: "2rem",
           backgroundColor: "#f5f5f5",
+          padding: "2rem",
         }}
       >
         <img
@@ -79,7 +80,7 @@ function WelcomePage() {
         </Sheet>
       </div>
     </CssVarsProvider>
-  );
+  )
 }
 
-export default WelcomePage;
+export default WelcomePage

@@ -1,9 +1,37 @@
-import React from "react";
-import { Box, Typography, TextField, Button } from "@mui/material";
-import castleImage from "../assets/pictures/Splash.png";
+import React, { useState } from "react"
+import { Box, Typography, TextField, Button, Alert } from "@mui/material"
+import castleImage from "../assets/pictures/Splash.png"
 
 function SignUpPage() {
- 
+  const [email, setEmail] = useState("")
+  const [username, setUsername] = useState("")
+  const [password, setPassword] = useState("")
+  const [error, setError] = useState(null)
+  const [success, setSuccess] = useState(null)
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setError(null)
+    setSuccess(null)
+
+    try {
+      const response = await fetch("/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, username, password }),
+      })
+
+      const data = await response.json()
+      if (!response.ok) throw new Error(data.error || "Failed to sign up")
+
+      setSuccess("Account created successfully. You can now log in!")
+      setEmail("")
+      setUsername("")
+      setPassword("")
+    } catch (err) {
+      setError(err.message)
+    }
+  }
 
   return (
     <Box
@@ -31,6 +59,7 @@ function SignUpPage() {
 
       <Box
         component="form"
+        onSubmit={handleSubmit}
         sx={{
           display: "flex",
           flexDirection: "column",
@@ -46,33 +75,46 @@ function SignUpPage() {
           Sign Up
         </Typography>
 
+        {error && <Alert severity="error">{error}</Alert>}
+        {success && <Alert severity="success">{success}</Alert>}
+
         <TextField
           label="Enter your e-mail"
           type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           placeholder="Enter your e-mail"
           variant="outlined"
           size="small"
           fullWidth
+          required
         />
 
         <TextField
           label="Enter a username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
           placeholder="Enter a username"
           variant="outlined"
           size="small"
           fullWidth
+          required
         />
 
         <TextField
           label="Choose a password"
           type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
           placeholder="Choose a password"
           variant="outlined"
           size="small"
           fullWidth
+          required
         />
 
         <Button
+          type="submit"
           variant="contained"
           color="primary"
           sx={{
@@ -91,7 +133,7 @@ function SignUpPage() {
         </Typography>
       </Box>
     </Box>
-  );
+  )
 }
 
-export default SignUpPage;
+export default SignUpPage
