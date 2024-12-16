@@ -1,4 +1,5 @@
 import React, { useState } from "react"
+import { useNavigate } from "react-router-dom"
 import { Box, Typography, TextField, Button, Alert } from "@mui/material"
 import castleImage from "../assets/pictures/Splash.png"
 
@@ -8,6 +9,8 @@ function SignUpPage() {
   const [password, setPassword] = useState("")
   const [error, setError] = useState(null)
   const [success, setSuccess] = useState(null)
+
+  const nav = useNavigate()
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -24,10 +27,8 @@ function SignUpPage() {
       const data = await response.json()
       if (!response.ok) throw new Error(data.error || "Failed to sign up")
 
-      setSuccess("Account created successfully. You can now log in!")
-      setEmail("")
-      setUsername("")
-      setPassword("")
+      setSuccess("Account created successfully!")
+      setTimeout(() => nav("/posts"), 1000)
     } catch (err) {
       setError(err.message)
     }

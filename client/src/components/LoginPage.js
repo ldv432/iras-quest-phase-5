@@ -1,31 +1,37 @@
-import React, { useState } from "react"
-import { Box, Typography, TextField, Button, Alert } from "@mui/material"
-import castleImage from "../assets/pictures/Splash.png"
+import React, { useState } from "react";
+import { Box, Typography, TextField, Button, Alert } from "@mui/material";
+import castleImage from "../assets/pictures/Splash.png";
+import { useNavigate } from "react-router-dom";
 
 function LoginPage() {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [error, setError] = useState(null)
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState(null);
+
+  const nav = useNavigate()
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setError(null)
+    e.preventDefault();
+    setError(null); 
 
     try {
       const r = await fetch("/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
-      })
+      });
 
-      const data = await r.json()
-      if (!r.ok) throw new Error(data.error || "Failed to log in")
+      const data = await r.json();
+      if (!r.ok) throw new Error(data.error || "Failed to log in");
 
-      console.log("Login successful:", data)
+      console.log("Login successful:", data);
+      if (r.ok) {
+        nav("/posts"); // Navigate to posts page upon successful login
+      }
     } catch (err) {
-      setError(err.message)
+      setError(err.message);
     }
-  }
+  };
 
   return (
     <Box
@@ -105,13 +111,16 @@ function LoginPage() {
         </Button>
         <Typography sx={{ textAlign: "center", mt: 2 }}>
           Don't have an account?{" "}
-          <a href="/signup" style={{ textDecoration: "none", color: "#1976d2" }}>
+          <a
+            href="/signup"
+            style={{ textDecoration: "none", color: "#1976d2" }}
+          >
             Sign up here!
           </a>
         </Typography>
       </Box>
     </Box>
-  )
+  );
 }
 
-export default LoginPage
+export default LoginPage;
