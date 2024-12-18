@@ -17,3 +17,6 @@ class Post(db.Model, SerializerMixin):
     #Relationships
     user = db.relationship('User', back_populates='posts')
     postreactions = db.relationship('PostReaction', back_populates='post', cascade='all, delete-orphan')
+
+    #Validations
+    #Need to make sure to find user with the user_id given

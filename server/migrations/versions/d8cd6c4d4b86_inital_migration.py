@@ -1,8 +1,8 @@
-"""initial migration
+"""inital migration
 
-Revision ID: 1b04207d20fe
+Revision ID: d8cd6c4d4b86
 Revises: 
-Create Date: 2024-12-11 22:32:48.194635
+Create Date: 2024-12-17 20:18:24.475102
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '1b04207d20fe'
+revision = 'd8cd6c4d4b86'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -53,9 +53,6 @@ def upgrade():
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], name=op.f('fk_players_user_id_users')),
     sa.PrimaryKeyConstraint('id')
     )
-    with op.batch_alter_table('players', schema=None) as batch_op:
-        batch_op.create_index('ix_players_user_id', ['user_id'], unique=False)
-
     op.create_table('posts',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=False),
@@ -64,9 +61,6 @@ def upgrade():
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], name=op.f('fk_posts_user_id_users')),
     sa.PrimaryKeyConstraint('id')
     )
-    with op.batch_alter_table('posts', schema=None) as batch_op:
-        batch_op.create_index('ix_posts_user_id', ['user_id'], unique=False)
-
     op.create_table('postreactions',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=False),
@@ -89,13 +83,7 @@ def downgrade():
         batch_op.drop_index(batch_op.f('ix_postreactions_user_id'))
 
     op.drop_table('postreactions')
-    with op.batch_alter_table('posts', schema=None) as batch_op:
-        batch_op.drop_index('ix_posts_user_id')
-
     op.drop_table('posts')
-    with op.batch_alter_table('players', schema=None) as batch_op:
-        batch_op.drop_index('ix_players_user_id')
-
     op.drop_table('players')
     op.drop_table('users')
     op.drop_table('reactions')

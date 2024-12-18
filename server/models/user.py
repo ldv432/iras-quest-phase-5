@@ -2,7 +2,10 @@ from config import db, flask_bcrypt
 from sqlalchemy_serializer import SerializerMixin
 from sqlalchemy.orm import validates
 from sqlalchemy.ext.hybrid import hybrid_property
+from better_profanity import profanity
 import re
+
+profanity.load_censor_words()
 
 class User(db.Model, SerializerMixin):
     __tablename__ = 'users'
@@ -19,7 +22,7 @@ class User(db.Model, SerializerMixin):
     postreactions = db.relationship('PostReaction', back_populates='user', cascade='all, delete-orphan')
 
     #Serialization
-    serialize_rules = ('-_password_hash', '-players', '-posts', '-postreactions')
+    serialize_rules = ('-_password_hash', '-players', '-posts')
 
     #Representation
     def __repr__(self):
@@ -32,10 +35,14 @@ class User(db.Model, SerializerMixin):
             raise ValueError("Username must be at least 2 characters long.")
         if not value.isalnum():
             raise ValueError("Username must only contain letters and numbers.")
+        if profanity.contains_profanity(value):
+            raise ValueError("Username contains inappropriate language.")
         return value
 
     @validates('email')
     def validate_email(self, _, value):
+        if profanity.contains_profanity(value):
+            raise ValueError("Email contains inappropriate language.")
         email_regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
         if not re.match(email_regex, value):
             raise ValueError("Invalid email format.")

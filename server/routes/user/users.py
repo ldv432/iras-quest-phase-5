@@ -2,6 +2,7 @@ from models.user import User
 from flask_restful import Resource, request
 from flask import make_response
 from config import db
+from better_profanity import profanity
 
 class CreateUser(Resource):
     def post(self):     
@@ -19,6 +20,9 @@ class CreateUser(Resource):
             return {"error": "Username must be at least two characters long."}
         if not username.isalnum():
             return {"error": "Username can only contain numbers and letters."}
+        for key, value in data.items():
+            if profanity.contains_profanity(value):
+                return {"error": f"Inapproriate content detected in {key}"}
 
         # Check backend for duplicates
         if User.query.filter_by(username=username).first():
