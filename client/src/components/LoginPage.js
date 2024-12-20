@@ -2,17 +2,18 @@ import React, { useState } from "react";
 import { Box, Typography, TextField, Button, Alert } from "@mui/material";
 import castleImage from "../assets/pictures/Splash.png";
 import { useNavigate } from "react-router-dom";
+import Navbar from "./Navbar";
 
 function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
 
-  const nav = useNavigate()
+  const nav = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(null); 
+    setError(null);
 
     try {
       const r = await fetch("/login", {
@@ -34,92 +35,95 @@ function LoginPage() {
   };
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "center",
-        minHeight: "100vh",
-        bgcolor: "#f5f5f5",
-        gap: 4,
-        px: 4,
-        fontFamily: "Arial, sans-serif",
-      }}
-    >
-      <Box>
-        <img
-          src={castleImage}
-          alt="Ira's Quest Castle"
-          style={{
-            width: "700px",
-            height: "700px",
-            objectFit: "cover",
-          }}
-        />
-      </Box>
-
+    <>
+      <Navbar />
       <Box
-        component="form"
-        onSubmit={handleSubmit}
         sx={{
           display: "flex",
-          flexDirection: "column",
-          gap: 2,
-          width: "300px",
-          p: 3,
-          borderRadius: "8px",
-          boxShadow: "0 4px 10px rgba(0, 0, 0, 0.2)",
-          bgcolor: "white",
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "center",
+          minHeight: "100vh",
+          bgcolor: "#f5f5f5",
+          gap: 4,
+          px: 4,
+          fontFamily: "Arial, sans-serif",
         }}
       >
-        <Typography variant="h4" sx={{ mb: 2, textAlign: "center" }}>
-          Log In
-        </Typography>
+        <Box>
+          <img
+            src={castleImage}
+            alt="Ira's Quest Castle"
+            style={{
+              width: "500px",
+              height: "500px",
+              objectFit: "cover",
+            }}
+          />
+        </Box>
 
-        {error && <Alert severity="error">{error}</Alert>}
-
-        <TextField
-          type="email"
-          placeholder="Enter your email"
-          variant="outlined"
-          size="small"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          fullWidth
-          required
-        />
-
-        <TextField
-          type="password"
-          placeholder="Enter your password"
-          variant="outlined"
-          size="small"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          fullWidth
-          required
-        />
-
-        <Button
-          type="submit"
-          variant="contained"
-          color="primary"
-          sx={{ mt: 2, borderRadius: "8px", fontWeight: "bold" }}
+        <Box
+          component="form"
+          onSubmit={handleSubmit}
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 2,
+            width: "300px",
+            p: 3,
+            borderRadius: "8px",
+            boxShadow: "0 4px 10px rgba(0, 0, 0, 0.2)",
+            bgcolor: "white",
+          }}
         >
-          Log In
-        </Button>
-        <Typography sx={{ textAlign: "center", mt: 2 }}>
-          Don't have an account?{" "}
-          <a
-            href="/signup"
-            style={{ textDecoration: "none", color: "#1976d2" }}
+          <Typography variant="h4" sx={{ mb: 2, textAlign: "center" }}>
+            Log In
+          </Typography>
+
+          {error && <Alert severity="error">{error}</Alert>}
+
+          <TextField
+            type="email"
+            placeholder="Enter your email"
+            variant="outlined"
+            size="small"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            fullWidth
+            required
+          />
+
+          <TextField
+            type="password"
+            placeholder="Enter your password"
+            variant="outlined"
+            size="small"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            fullWidth
+            required
+          />
+
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            sx={{ mt: 2, borderRadius: "8px", fontWeight: "bold" }}
           >
-            Sign up here!
-          </a>
-        </Typography>
+            Log In
+          </Button>
+          <Typography sx={{ textAlign: "center", mt: 2 }}>
+            Don't have an account?{" "}
+            <a
+              href="/signup"
+              style={{ textDecoration: "none", color: "#1976d2" }}
+            >
+              Sign up here!
+            </a>
+          </Typography>
+        </Box>
       </Box>
-    </Box>
+    </>
   );
 }
 

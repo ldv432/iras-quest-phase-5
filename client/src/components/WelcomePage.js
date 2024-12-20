@@ -1,86 +1,128 @@
-import React from "react"
-import { useNavigate } from "react-router-dom"
-import castleImage from "../assets/pictures/Splash.png"
-import { CssVarsProvider } from "@mui/joy/styles"
-import Sheet from "@mui/joy/Sheet"
-import Typography from "@mui/joy/Typography"
-import Button from "@mui/joy/Button"
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import castleImage from "../assets/pictures/Splash.png";
+import { Box, Typography, Button } from "@mui/material";
+import Navbar from "./Navbar";
 
-function WelcomePage() {
-  const nav = useNavigate()
+function WelcomePage({ currentUser }) {
+  const nav = useNavigate();
+
+  const handlePlay = () => {
+    nav("/game");
+  };
+
+  const handlePost = () => {
+    nav("/posts");
+  };
 
   const handleLogin = () => {
-    nav("/login")
-  }
+    nav("/login");
+  };
 
   const handleSignup = () => {
-    nav("/signup")
-  }
+    nav("/signup");
+  };
 
   return (
-    <CssVarsProvider>
-      <div
-        style={{
+    <>
+      <Navbar currentUser={currentUser} />
+      <Box
+        sx={{
           display: "flex",
           flexDirection: "row",
           alignItems: "center",
           justifyContent: "center",
           minHeight: "100vh",
-          gap: "2rem",
-          backgroundColor: "#f5f5f5",
-          padding: "2rem",
+          bgcolor: "#f5f5f5",
+          gap: 4,
+          px: 4,
+          fontFamily: "Arial, sans-serif",
         }}
       >
-        <img
-          src={castleImage}
-          alt="Ira's Quest Castle"
-          style={{
-            width: "700px",
-            height: "700px",
-            objectFit: "cover",
-          }}
-        />
-        <Sheet
+        {/* Image Section */}
+        <Box>
+          <img
+            src={castleImage}
+            alt="Ira's Quest Castle"
+            style={{
+              width: "500px",
+              height: "500px",
+              objectFit: "cover",
+            }}
+          />
+        </Box>
+
+        {/* Content Section */}
+        <Box
           sx={{
-            width: 500,
-            py: 2,
-            px: 2,
             display: "flex",
             flexDirection: "column",
             gap: 2,
-            borderRadius: "sm",
-            boxShadow: "md",
-            alignItems: "center",
+            width: "400px",
+            p: 3,
+            borderRadius: "8px",
+            boxShadow: "0 4px 10px rgba(0, 0, 0, 0.2)",
+            bgcolor: "white",
+            textAlign: "center",
           }}
         >
-          <Typography level="h1" component="h1">
+          <Typography variant="h4" sx={{ mb: 2 }}>
             Welcome to Ira's Quest!
           </Typography>
-          <Typography level="body1" sx={{ textAlign: "center" }}>
-            In order to play the game, you'll need to log in or sign up.
-          </Typography>
-          <div style={{ display: "flex", gap: "1rem" }}>
-            <Button
-              variant="solid"
-              color="primary"
-              size="lg"
-              onClick={handleLogin}
-            >
-              Log In
-            </Button>
-            <Button
-              variant="soft"
-              color="neutral"
-              size="lg"
-              onClick={handleSignup}
-            >
-              Sign Up
-            </Button>
-          </div>
-        </Sheet>
-      </div>
-    </CssVarsProvider>
-  )
+
+          {currentUser ? (
+            <>
+              <Typography>
+                Ready to play or share your thoughts about the game?
+              </Typography>
+              <Box sx={{ display: "flex", justifyContent: "center", gap: 2 }}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handlePlay}
+                  sx={{ borderRadius: "8px", fontWeight: "bold" }}
+                >
+                  Play Ira's Quest!
+                </Button>
+                <Button
+                  variant="outlined"
+                  color="primary"
+                  onClick={handlePost}
+                  sx={{ borderRadius: "8px", fontWeight: "bold" }}
+                >
+                  Post About The Game
+                </Button>
+              </Box>
+            </>
+          ) : (
+            <>
+              <Typography>
+                In order to play the game, you'll need to log in or sign up.
+              </Typography>
+              <Box sx={{ display: "flex", justifyContent: "center", gap: 2 }}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleLogin}
+                  sx={{ borderRadius: "8px", fontWeight: "bold" }}
+                >
+                  Log In
+                </Button>
+                <Button
+                  variant="outlined"
+                  color="primary"
+                  onClick={handleSignup}
+                  sx={{ borderRadius: "8px", fontWeight: "bold" }}
+                >
+                  Sign Up
+                </Button>
+              </Box>
+            </>
+          )}
+        </Box>
+      </Box>
+    </>
+  );
 }
 
-export default WelcomePage
+export default WelcomePage;

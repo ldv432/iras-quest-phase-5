@@ -12,6 +12,11 @@ flask-migrate = "*"
 sqlalchemy-serializer = "*"
 flask-restful = "*"
 faker = "*"
+flask-bcrypt = "*"
+better-profanity = "*"
+pygame-ce = "*"
+pytmx = "*"
+pygbag = "*"
 
 [requires]
 python_full_version = "3.8.13"
