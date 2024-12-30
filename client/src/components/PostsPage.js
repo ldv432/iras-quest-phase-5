@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import { UserContext } from "./UserContext";
 import {
   Box,
   Card,
@@ -7,7 +8,9 @@ import {
   Typography,
   TextField,
   Button,
+  Modal,
 } from "@mui/material";
+import castleImage from "../assets/pictures/Splash.png";
 import {
   Favorite,
   FavoriteBorder,
@@ -18,43 +21,32 @@ import {
   Edit,
   Delete,
 } from "@mui/icons-material";
-import Navbar from "./Navbar";
 
-function PostsPage({ currentUser }) {
-  const [posts, setPosts] = useState([]); // Posts
+const PostsPage = () => {
+  const [posts, setPosts] = useState([]);
   const [userReactions, setUserReactions] = useState({});
   const [newPost, setNewPost] = useState("");
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editPost, setEditPost] = useState(null);
+  const [editContent, setEditContent] = useState("");
+  const { currentUser } = useContext(UserContext);
 
   // Fetch posts and user reactions
   useEffect(() => {
-    // if (!currentUser) return;
-
-    // Fetch Posts
     fetch("/forum/posts")
       .then((res) => res.json())
       .then((data) => setPosts(data))
       .catch((error) => console.error("Error fetching posts:", error));
 
-    // Fetch User Reactions
     fetch("/forum/reactions", { credentials: "include" })
       .then((res) => res.json())
       .then((data) => {
-        console.log(Object.keys(data))
         const reactions = {};
-        Object.keys(data).forEach(postId => {
-        let reactionData = data[postId]["counts"]
-        reactionData["user"] = data[postId]["user"]
-        console.log(reactionData)
-        reactions[postId] = reactionData
-        })
-        // data.forEach(({ post_id, reaction_type, count, user_reacted }) => {
-        //   if (!reactions[post_id]) {
-        //     reactions[post_id] = { like: 0, dislike: 0, favorite: 0, user: {} };
-        //   }
-        //   reactions[post_id][reaction_type] = count;
-        //   reactions[post_id].user[reaction_type] = user_reacted;
-        // });
-        console.log(reactions)
+        Object.keys(data).forEach((postId) => {
+          let reactionData = data[postId]["counts"];
+          reactionData["user"] = data[postId]["user"];
+          reactions[postId] = reactionData;
+        });
         setUserReactions(reactions);
       })
       .catch((error) => console.error("Error fetching reactions:", error));
@@ -62,7 +54,6 @@ function PostsPage({ currentUser }) {
 
   const handlePostSubmit = (e) => {
     e.preventDefault();
-
     fetch("/forum/posts", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -71,8 +62,8 @@ function PostsPage({ currentUser }) {
     })
       .then((res) => res.json())
       .then((data) => {
-        setPosts((prevPosts) => [data, ...prevPosts]); // Add new post to state
-        setNewPost(""); // Clear input field
+        setPosts((prevPosts) => [data, ...prevPosts]);
+        setNewPost("");
       })
       .catch((error) => console.error("Error adding post:", error));
   };
@@ -84,7 +75,7 @@ function PostsPage({ currentUser }) {
       credentials: "include",
       body: JSON.stringify({
         post_id: postId,
-        reaction_id: reactionId, // Ensure this is a number
+        reaction_id: reactionId,
       }),
     })
       .then((res) => res.json())
@@ -96,28 +87,104 @@ function PostsPage({ currentUser }) {
             3: 0,
             user: {},
           };
-          console.log(userReactions)
-
-          // Update counts and toggle based on backend response
           const updatedReactions = {
             ...postReactions,
-            [reactionId]: data.count, // Update count from backend
+            [reactionId]: data.count,
             user: {
               ...postReactions.user,
-              [reactionId]: data.status === "added", // Toggle user reaction
+              [reactionId]: data.status === "added",
             },
           };
-
           return { ...prev, [postId]: updatedReactions };
         });
       })
       .catch((error) => console.error("Error toggling reaction:", error));
   };
 
+  const handleEditClick = (post) => {
+    setEditPost(post);
+    setEditContent(post.content);
+    setEditModalOpen(true);
+  };
+
+  const handleEditSubmit = () => {
+    fetch(`/forum/posts/${editPost.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ content: editContent }),
+    })
+      .then((res) => res.json())
+      .then((updatedPost) => {
+        setPosts((prevPosts) =>
+          prevPosts.map((post) =>
+            post.id === updatedPost.id ? updatedPost : post
+          )
+        );
+        setEditModalOpen(false);
+        setEditPost(null);
+        setEditContent("");
+      })
+      .catch((error) => console.error("Error editing post:", error));
+  };
+
+  const handleDelete = (postId) => {
+    fetch(`/forum/posts/${postId}`, {
+      method: "DELETE",
+      credentials: "include",
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to delete post");
+        setPosts((prevPosts) => prevPosts.filter((post) => post.id !== postId));
+      })
+      .catch((error) => console.error("Error deleting post:", error));
+  };
+
+  const handleModalClose = () => {
+    setEditModalOpen(false);
+    setEditPost(null);
+    setEditContent("");
+  };
+
   return (
-    <>
-      <Navbar />
-      <Box sx={{ p: 3 }}>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+        minHeight: "100vh",
+        bgcolor: "#f5f5f5",
+        gap: 4,
+        px: 4,
+      }}
+    >
+      {/* Image Section */}
+      <Box>
+        <img
+          src={castleImage}
+          alt="Ira's Quest Castle"
+          style={{
+            width: "500px",
+            height: "500px",
+            objectFit: "cover",
+          }}
+        />
+      </Box>
+
+      {/* Content Section */}
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 2,
+          width: "600px",
+          p: 3,
+          borderRadius: "8px",
+          boxShadow: "0 4px 10px rgba(0, 0, 0, 0.2)",
+          bgcolor: "white",
+        }}
+      >
         {/* Post Form */}
         <Box
           component="form"
@@ -128,8 +195,8 @@ function PostsPage({ currentUser }) {
             gap: 2,
             mb: 4,
             p: 2,
-            boxShadow: "0 2px 5px rgba(0,0,0,0.2)",
             borderRadius: "8px",
+            boxShadow: "0 2px 5px rgba(0,0,0,0.2)",
             bgcolor: "white",
           }}
         >
@@ -153,6 +220,7 @@ function PostsPage({ currentUser }) {
           </Button>
         </Box>
 
+        {/* Posts List */}
         {posts.map((post) => (
           <Card
             key={post.id}
@@ -172,40 +240,25 @@ function PostsPage({ currentUser }) {
                   mb: 1,
                 }}
               >
-                {/* Username on the left */}
                 <Typography variant="h6" sx={{ fontWeight: "bold" }}>
                   {post.user?.username || "Unknown User"}
                 </Typography>
-
-                {/* Date and Time on the right */}
                 <Typography
                   variant="caption"
                   color="textSecondary"
                   sx={{ textAlign: "right" }}
                 >
-                  {new Date(post.created_at).toLocaleString(undefined, {
-                    year: "numeric",
-                    month: "short",
-                    day: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                    hour12: true,
-                  })}
+                  {new Date(post.created_at).toLocaleString()}
                 </Typography>
               </Box>
-
-              {/* Post Content */}
               <Typography variant="body1" sx={{ mb: 1 }}>
                 {post.content}
               </Typography>
-              {/* Reaction Buttons */}
               <Box sx={{ display: "flex", gap: 2, mt: 2 }}>
-                {/* Like Button */}
+                {/* Reactions */}
                 <IconButton
-                  onClick={() => toggleReaction(post.id, 1)} // Pass as number (no quotes)
-                  color={
-                    userReactions[post.id]?.user[1] ? "primary" : "default"
-                  }
+                  onClick={() => toggleReaction(post.id, 1)}
+                  color={userReactions[post.id]?.user[1] ? "primary" : "default"}
                 >
                   {userReactions[post.id]?.user[1] ? (
                     <ThumbUp />
@@ -216,10 +269,8 @@ function PostsPage({ currentUser }) {
                     {userReactions[post.id]?.[1] || 0}
                   </Typography>
                 </IconButton>
-
-                {/* Dislike Button */}
                 <IconButton
-                  onClick={() => toggleReaction(post.id, 2)} // Pass as number
+                  onClick={() => toggleReaction(post.id, 2)}
                   color={userReactions[post.id]?.user[2] ? "error" : "default"}
                 >
                   {userReactions[post.id]?.user[2] ? (
@@ -231,10 +282,8 @@ function PostsPage({ currentUser }) {
                     {userReactions[post.id]?.[2] || 0}
                   </Typography>
                 </IconButton>
-
-                {/* Favorite Button */}
                 <IconButton
-                  onClick={() => toggleReaction(post.id, 3)} // Pass as number
+                  onClick={() => toggleReaction(post.id, 3)}
                   color={
                     userReactions[post.id]?.user[3] ? "secondary" : "default"
                   }
@@ -248,41 +297,73 @@ function PostsPage({ currentUser }) {
                     {userReactions[post.id]?.[3] || 0}
                   </Typography>
                 </IconButton>
+                {/* Edit and Delete Buttons */}
+                {post.user_id === currentUser?.id && (
+                  <>
+                    <IconButton
+                      onClick={() => handleEditClick(post)}
+                      color="info"
+                    >
+                      <Edit />
+                    </IconButton>
+                    <IconButton
+                      onClick={() => handleDelete(post.id)}
+                      color="error"
+                    >
+                      <Delete />
+                    </IconButton>
+                  </>
+                )}
               </Box>
-
-              {/* Edit/Delete Buttons */}
-              {post.user_id === currentUser?.id && (
-                <Box
-                  sx={{ display: "flex", gap: 1, alignItems: "center", mt: 1 }}
-                >
-                  <IconButton
-                    onClick={() => {
-                      const updatedContent = prompt(
-                        "Edit your post:",
-                        post.content
-                      );
-                      if (updatedContent) {
-                        console.log("Edit post:", updatedContent);
-                      }
-                    }}
-                    color="info"
-                  >
-                    <Edit />
-                  </IconButton>
-                  <IconButton
-                    onClick={() => console.log("Delete post:", post.id)}
-                    color="error"
-                  >
-                    <Delete />
-                  </IconButton>
-                </Box>
-              )}
             </CardContent>
           </Card>
         ))}
       </Box>
-    </>
+
+      {/* Edit Post Modal */}
+      <Modal
+        open={editModalOpen}
+        onClose={handleModalClose}
+        aria-labelledby="edit-post-modal"
+        aria-describedby="edit-post-modal-description"
+      >
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 400,
+            bgcolor: "white",
+            p: 4,
+            borderRadius: "8px",
+            boxShadow: 24,
+          }}
+        >
+          <Typography id="edit-post-modal" variant="h6" sx={{ mb: 2 }}>
+            Edit Post
+          </Typography>
+          <TextField
+            multiline
+            rows={4}
+            fullWidth
+            variant="outlined"
+            value={editContent}
+            onChange={(e) => setEditContent(e.target.value)}
+            sx={{ mb: 2 }}
+          />
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleEditSubmit}
+            fullWidth
+          >
+            Save Changes
+          </Button>
+        </Box>
+      </Modal>
+    </Box>
   );
-}
+};
 
 export default PostsPage;

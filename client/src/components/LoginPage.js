@@ -1,42 +1,43 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Box, Typography, TextField, Button, Alert } from "@mui/material";
 import castleImage from "../assets/pictures/Splash.png";
 import { useNavigate } from "react-router-dom";
-import Navbar from "./Navbar";
+import { UserContext } from "./UserContext";
 
-function LoginPage() {
+
+const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
+  const { setCurrentUser } = useContext(UserContext);
 
   const nav = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
-
+  
     try {
       const r = await fetch("/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
-
+  
       const data = await r.json();
       if (!r.ok) throw new Error(data.error || "Failed to log in");
-
-      console.log("Login successful:", data);
-      if (r.ok) {
-        nav("/posts"); // Navigate to posts page upon successful login
-      }
+  
+      // Update currentUser in context
+      setCurrentUser(data);
+  
+      // Navigate after setting the state
+      nav("/posts");
     } catch (err) {
       setError(err.message);
     }
   };
 
   return (
-    <>
-      <Navbar />
       <Box
         sx={{
           display: "flex",
@@ -123,7 +124,6 @@ function LoginPage() {
           </Typography>
         </Box>
       </Box>
-    </>
   );
 }
 

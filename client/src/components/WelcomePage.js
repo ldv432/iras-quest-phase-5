@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import castleImage from "../assets/pictures/Splash.png";
 import { Box, Typography, Button } from "@mui/material";
-import Navbar from "./Navbar";
+import { UserContext } from "./UserContext";
 
-function WelcomePage({ currentUser }) {
+
+const WelcomePage = () => {
+  const { currentUser } = useContext(UserContext);
   const nav = useNavigate();
 
   const handlePlay = () => {
@@ -24,8 +26,6 @@ function WelcomePage({ currentUser }) {
   };
 
   return (
-    <>
-      <Navbar currentUser={currentUser} />
       <Box
         sx={{
           display: "flex",
@@ -121,7 +121,7 @@ function WelcomePage({ currentUser }) {
           )}
         </Box>
       </Box>
-    </>
+    
   );
 }
 

@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useContext } from "react";
+import { UserContext } from "./UserContext";
 import { AppBar, Toolbar, Typography, Box } from "@mui/material";
 import { NavLink, useNavigate } from "react-router-dom";
-import toast, { Toaster } from "react-hot-toast"
 
-const Navbar = ({ currentUser, setCurrentUser }) => {
+const Navbar = () => {
+  const { currentUser, setCurrentUser } = useContext(UserContext);
+  console.log("Navbar current user:", currentUser)
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -14,102 +16,89 @@ const Navbar = ({ currentUser, setCurrentUser }) => {
       });
       if (!response.ok) throw new Error("Failed to log out");
       setCurrentUser(null);
-      toast.success("Successfully logged out!");
+      navigate("/");
     } catch (error) {
       console.error("Logout error:", error);
-      toast.error("Failed to log out.");
     }
   };
 
-  const navItemsLoggedOut = [
-    { title: "Home", path: "/" },
-    { title: "Login", path: "/login" },
-    { title: "Signup", path: "/signup" },
-  ];
-
-  const navItemsLoggedIn = [
-    { title: "Home", path: "/" },
-    { title: "Play Ira's Quest", path: "/game" },
-    { title: "Chat About The Game", path: "/posts" },
-    { title: "Leader Board", path: "/leaderboard" },
-  ];
+  const linkStyle = ({ isActive }) => ({
+    textDecoration: "none",
+    color: isActive ? "white" : "black",
+    backgroundColor: isActive ? "black" : "transparent",
+    padding: "8px 16px",
+    borderRadius: "4px",
+    fontWeight: "600", // Adjusted for Inter font
+    fontSize: "16px",
+    fontFamily: "'Inter', sans-serif",
+    transition: "background-color 0.3s, color 0.3s",
+  });
 
   return (
-    <AppBar position="static" color="default" sx={{ boxShadow: "none" }}>
-      <Toolbar>
-        <Box
+    <AppBar
+      position="static"
+      color="default"
+      sx={{
+        boxShadow: "none",
+        backgroundColor: "#fff",
+        borderBottom: "1px solid #ddd",
+        fontFamily: "'Inter', sans-serif",
+      }}
+    >
+      <Toolbar sx={{ justifyContent: "space-between", padding: "0 16px" }}>
+        <Typography
+          variant="h6"
           sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            gap: 4,
-            py: 2,
-            borderBottom: "1px solid #ddd",
-            backgroundColor: "#fff",
-            width: "100%",
-            position: "fixed",
-            top: 0,
-            zIndex: 1000,
+            fontWeight: "700", // Bold font for the title
+            fontFamily: "'Inter', sans-serif",
           }}
         >
-          {!currentUser &&
-            navItemsLoggedOut.map((item) => (
-              <NavLink
-                key={item.title}
-                to={item.path}
-                style={({ isActive }) => ({
-                  textDecoration: "none",
-                  color: isActive ? "white" : "black",
-                  backgroundColor: isActive ? "black" : "transparent",
+          Ira's Quest
+        </Typography>
+        <Box sx={{ display: "flex", gap: 2 }}>
+          {!currentUser ? (
+            <>
+              <NavLink to="/login" style={linkStyle}>
+                Login
+              </NavLink>
+              <NavLink to="/signup" style={linkStyle}>
+                Signup
+              </NavLink>
+            </>
+          ) : (
+            <>
+              <NavLink to="/" style={linkStyle}>
+                Home
+              </NavLink>
+              <NavLink to="/game" style={linkStyle}>
+                Play Ira's Quest
+              </NavLink>
+              <NavLink to="/posts" style={linkStyle}>
+                Chat About The Game
+              </NavLink>
+              <NavLink to="/leaderboard" style={linkStyle}>
+                Leader Board
+              </NavLink>
+              <Typography
+                onClick={handleLogout}
+                sx={{
+                  cursor: "pointer",
                   padding: "8px 16px",
                   borderRadius: "4px",
-                  fontWeight: isActive ? "bold" : "normal",
-                })}
+                  fontWeight: "600",
+                  fontSize: "16px",
+                  fontFamily: "'Inter', sans-serif",
+                  color: "black",
+                  "&:hover": {
+                    backgroundColor: "black",
+                    color: "white",
+                  },
+                  transition: "background-color 0.3s, color 0.3s",
+                }}
               >
-                <Typography variant="button">{item.title}</Typography>
-              </NavLink>
-            ))}
-
-          {currentUser &&
-            navItemsLoggedIn.map((item) => (
-              <NavLink
-                key={item.title}
-                to={item.path}
-                style={({ isActive }) => ({
-                  textDecoration: "none",
-                  color: isActive ? "white" : "black",
-                  backgroundColor: isActive ? "black" : "transparent",
-                  padding: "8px 16px",
-                  borderRadius: "4px",
-                  fontWeight: isActive ? "bold" : "normal",
-                })}
-              >
-                <Typography variant="button">{item.title}</Typography>
-              </NavLink>
-            ))}
-
-          {currentUser && (
-            <Typography
-              variant="button"
-              onClick={async () => {
-                await handleLogout();
-                navigate("/");
-              }}
-              sx={{
-                textDecoration: "none",
-                color: "black",
-                padding: "8px 16px",
-                borderRadius: "4px",
-                fontWeight: "bold",
-                cursor: "pointer",
-                "&:hover": {
-                  backgroundColor: "black",
-                  color: "white",
-                },
-              }}
-            >
-              Log Out
-            </Typography>
+                Logout
+              </Typography>
+            </>
           )}
         </Box>
       </Toolbar>

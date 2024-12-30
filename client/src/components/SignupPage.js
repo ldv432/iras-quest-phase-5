@@ -1,43 +1,65 @@
-import React, { useState } from "react";
+import React, { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { Box, Typography, TextField, Button, Alert } from "@mui/material";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
 import castleImage from "../assets/pictures/Splash.png";
-import Navbar from "./Navbar";
+import { UserContext } from "./UserContext";
 
-function SignUpPage() {
-  const [email, setEmail] = useState("");
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(null);
 
+
+const SignUpPage = () => {
+  const { setCurrentUser } = useContext(UserContext);
   const nav = useNavigate();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError(null);
-    setSuccess(null);
+  // Validation schema using Yup
+  const validationSchema = Yup.object({
+    email: Yup.string()
+      .email("Invalid email format")
+      .required("Email is required"),
+    username: Yup.string()
+      .min(3, "Username must be at least 2 characters")
+      .required("Username is required"),
+    password: Yup.string()
+      .min(6, "Password must be at least 6 characters")
+      .required("Password is required"),
+  });
 
-    try {
-      const response = await fetch("/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, username, password }),
-      });
-
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Failed to sign up");
-
-      setSuccess("Account created successfully!");
-      setTimeout(() => nav("/posts"), 1000);
-    } catch (err) {
-      setError(err.message);
-    }
+  // Formik initial values
+  const initialValues = {
+    email: "",
+    username: "",
+    password: "",
   };
 
+
+const handleSubmit = async (values, { setSubmitting, setFieldError, setStatus }) => {
+  setStatus(null); // Clear previous status messages
+  try {
+    const response = await fetch("/signup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(values),
+    });
+
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || "Failed to sign up");
+
+    // Update the currentUser in the context
+    setCurrentUser(data);
+
+    setStatus({ success: "Account created successfully!" });
+
+    // Navigate to the posts page immediately after updating the user context
+    nav("/posts");
+  } catch (err) {
+    setFieldError("general", err.message); // Set general error
+  } finally {
+    setSubmitting(false);
+  }
+};
+
   return (
-    <>
-      <Navbar />
       <Box
         sx={{
           display: "flex",
@@ -62,8 +84,6 @@ function SignUpPage() {
         </Box>
 
         <Box
-          component="form"
-          onSubmit={handleSubmit}
           sx={{
             display: "flex",
             flexDirection: "column",
@@ -79,56 +99,76 @@ function SignUpPage() {
             Sign Up
           </Typography>
 
-          {error && <Alert severity="error">{error}</Alert>}
-          {success && <Alert severity="success">{success}</Alert>}
-
-          <TextField
-            label="Enter your e-mail"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Enter your e-mail"
-            variant="outlined"
-            size="small"
-            fullWidth
-            required
-          />
-
-          <TextField
-            label="Enter a username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            placeholder="Enter a username"
-            variant="outlined"
-            size="small"
-            fullWidth
-            required
-          />
-
-          <TextField
-            label="Choose a password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Choose a password"
-            variant="outlined"
-            size="small"
-            fullWidth
-            required
-          />
-
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            sx={{
-              mt: 2,
-              borderRadius: "8px",
-              fontWeight: "bold",
-            }}
+          <Formik
+            initialValues={initialValues}
+            validationSchema={validationSchema}
+            onSubmit={handleSubmit}
           >
-            Sign Up
-          </Button>
+            {({ isSubmitting, status, errors }) => (
+              <Form>
+                {errors.general && (
+                  <Alert severity="error" sx={{ mb: 2 }}>
+                    {errors.general}
+                  </Alert>
+                )}
+                {status?.success && (
+                  <Alert severity="success" sx={{ mb: 2 }}>
+                    {status.success}
+                  </Alert>
+                )}
+
+                <Field
+                  as={TextField}
+                  name="email"
+                  label="Enter your e-mail"
+                  type="email"
+                  variant="outlined"
+                  size="small"
+                  fullWidth
+                  error={!!errors.email}
+                  helperText={<ErrorMessage name="email" />}
+                />
+
+                <Field
+                  as={TextField}
+                  name="username"
+                  label="Enter a username"
+                  variant="outlined"
+                  size="small"
+                  fullWidth
+                  error={!!errors.username}
+                  helperText={<ErrorMessage name="username" />}
+                />
+
+                <Field
+                  as={TextField}
+                  name="password"
+                  label="Choose a password"
+                  type="password"
+                  variant="outlined"
+                  size="small"
+                  fullWidth
+                  error={!!errors.password}
+                  helperText={<ErrorMessage name="password" />}
+                />
+
+                <Button
+                  type="submit"
+                  variant="contained"
+                  color="primary"
+                  disabled={isSubmitting}
+                  sx={{
+                    mt: 2,
+                    borderRadius: "8px",
+                    fontWeight: "bold",
+                  }}
+                >
+                  {isSubmitting ? "Signing Up..." : "Sign Up"}
+                </Button>
+              </Form>
+            )}
+          </Formik>
+
           <Typography sx={{ textAlign: "center", mt: 2 }}>
             Already have an account?{" "}
             <a
@@ -140,8 +180,7 @@ function SignUpPage() {
           </Typography>
         </Box>
       </Box>
-    </>
   );
-}
+};
 
 export default SignUpPage;
