@@ -7,6 +7,7 @@ from flask_restful import Api
 from flask_bcrypt import Bcrypt
 from flask_sqlalchemy import SQLAlchemy 
 from sqlalchemy import MetaData
+from os import environ
 
 # Local imports
 
@@ -30,4 +31,7 @@ api = Api(app)
 
 # Instantiate Bcrypt
 flask_bcrypt = Bcrypt(app)
+
+# App Secret Key
+app.secret_key = environ.get("SECRET_KEY")
 

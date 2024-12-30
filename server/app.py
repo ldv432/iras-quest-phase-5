@@ -29,8 +29,7 @@ from routes.auth.login import Login
 from routes.auth.current_user import CurrentUser
 from routes.auth.logout import Logout
 
-# Secret Key for Sessions
-app.secret_key = "JIMMY DEAN SAUSAGES?"
+
 
 # Route Registration
 api.add_resource(Signup, '/signup')  # POST: User Signup
