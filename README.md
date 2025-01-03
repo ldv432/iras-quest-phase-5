@@ -1,5 +1,4 @@
-# Ira's Quest: Full-Stack Adventure Game
-
+# Ira's Quest: Full-Stack RPG side-scroller game, soon-to-be platformer
 **Welcome to Ira's Quest!** This project is a labor of love, combining a React frontend, a Flask backend, and a Pygame-based game, all dedicated to my son, Ira. The application integrates dynamic gameplay, a social forum, and user account management to create a multifaceted web experience.
 
 ---
