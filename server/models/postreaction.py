@@ -4,6 +4,8 @@ from sqlalchemy_serializer import SerializerMixin
 class PostReaction(db.Model, SerializerMixin):
     __tablename__ = 'postreactions'
 
+    __table_args__ = (db.UniqueConstraint("user_id", "post_id"),)
+
     #Attributes
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False, index=True)

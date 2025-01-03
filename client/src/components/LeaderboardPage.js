@@ -1,7 +1,7 @@
 import React from "react";
 
 const LeaderboardPage = () => {
-  return <div>Welcome to the Game Page!</div>;
+  return <div>Currently under construction!</div>;
 };
 
 export default LeaderboardPage;

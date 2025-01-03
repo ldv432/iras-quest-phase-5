@@ -1,8 +1,8 @@
-"""inital migration
+"""initial migration
 
-Revision ID: 2d135da108a1
+Revision ID: 9f081a032045
 Revises: 
-Create Date: 2024-12-20 15:13:34.661776
+Create Date: 2025-01-02 11:07:45.118692
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '2d135da108a1'
+revision = '9f081a032045'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -41,6 +41,7 @@ def upgrade():
     sa.Column('username', sa.String(length=30), nullable=False),
     sa.Column('_password_hash', sa.String(length=128), nullable=False),
     sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('email'),
     sa.UniqueConstraint('username')
     )
     op.create_table('players',
@@ -69,7 +70,8 @@ def upgrade():
     sa.ForeignKeyConstraint(['post_id'], ['posts.id'], name=op.f('fk_postreactions_post_id_posts')),
     sa.ForeignKeyConstraint(['reaction_id'], ['reactions.id'], name=op.f('fk_postreactions_reaction_id_reactions')),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], name=op.f('fk_postreactions_user_id_users')),
-    sa.PrimaryKeyConstraint('id')
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('user_id', 'post_id')
     )
     with op.batch_alter_table('postreactions', schema=None) as batch_op:
         batch_op.create_index(batch_op.f('ix_postreactions_reaction_id'), ['reaction_id'], unique=False)
